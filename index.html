@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>沈奎的足球信仰之旅</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: 'Microsoft YaHei', 'Heiti SC', sans-serif;
+            overflow: hidden;
+        }
+        #gameContainer {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+        }
+        canvas {
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA); /* 稍微好一点的天空 */
+            border: 4px solid #333;
+            display: block;
+        }
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 1px 1px 0 #fff;
+            background: rgba(255,255,255,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: #d32f2f;
+            text-shadow: 1px 1px 0 #fff;
+            display: none;
+            text-align: center;
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 4px solid #333;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            min-width: 400px;
+        }
+        .inter-blue { color: #0057b8; }
+        .milan-red { color: #c00c0c; }
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="ui">收集进度: <span id="levelDisplay">1</span> / 5</div>
+    <div id="message">加载中...</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const uiLevel = document.getElementById('levelDisplay');
+    const msgBox = document.getElementById('message');
+
+    // --- 资源加载 (AC米兰队标) ---
+    // 使用Base64编码的简易队标，确保单文件可运行
+    const acLogoImg = new Image();
+    acLogoImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAEJklEQVR4XuWYW2wUVRzG/zN7md3tlltopS1tAdpCoS1QCiKFlgcoQYSEF4IPIAYSE2M0Gk1QjI9GTXwg+qA+EEx8gBBIJBAkFChIq5RCoS2lLe0Wdne72+12Z84xO7S2tJ2d3bb2S07ycmbmO+f/n/93zoQ9vNgT+wGgR1XVRX+Xy+XF7/03T1EUNm3BggWL+vr6tqiqqn/0y8/yV1t+o+HwUjZ37lypWq221NfXt/1PgaZptg8PD3f6jRjP54lX4oSC4QjKy8vHXS5X+H8C29rabF6v1x0IBFj1hQ9x8fAn4GMR9gC7F6+GrXIF42lpaYFpmsH/BKR7a3t7+8b2jja8s/ltnD18AIkKAbkXkPqR741D+SfrYV2yAnzJTHa3s7PzvMvlGpwIkN7z6927dz/R093N1rw7D+9+1o7r/SEIgwIoFf0Gg+0c+4G6fAXKH67D3GUvME7Xdb2urq7zroD0y66urq3d3d3s/a834+2PtqHj8hD48BDUq9dA+m9C7e2C2tsN9eJZaB0dEG+NgR8bg3vJalQ8vIapN01z1CUBJbY/Go1u7e/vZxv3vo99hz7G1QERYq8OqesqSJ8fau9NqD3XQQb7IRCi7j6QXj+s02vQ4Mji8tUoX7mG3R0MBj0lJSUnHwuQ9v8kEoneSCTCtn20Bb8c+AB9IwoEfwCkjhZITd9B6m0fJTDtN4Fk/s1+8xUoX/IAKlevZ/dGo9E5pW50W/V3aU1NTefOnTvZ4a934NSP+5GIBiGOBeC8eA6C1AWVqj4dwZ3gWcgtlRBLp0Ps+B2q24uyNfUY93rZ3ZaWFs/GjRsHz/s/v1xTU+M5efIku9TzO0J9vSD6AFT0/QRlKACy9V6I3oPQBq5AnW4By2WBLbMBZslM5K3wQvW6Qe/mzvPA5XaD+wPgbDYk7XbYFi1H3vKNzN/V1dVH093otgDp4YqKipLLly+z0YF+5Id7YQz1A0P9EMZGAI26kQRIMQ12uwN2uxN21Q2b6oLkcILz2SB53JA8OaC3bH+rE3IuB6zLVqKo5hF21+fzXTC2bdtmmTqQ3qqqquoeGhp6gQyF2FiwD4loBGzMBIkMQxobBT+SAEkaUCxApb3N7oDD5Qbn9UJ2e2BzKOBsNhB1t7QyFE+tRFHtWjDXVNb7k6amppO3jZqpg+9u3bp14Vgs1i7G4uyq7sclXwiUvKk8A6E8A0SOAQb1M1QcOaWBk/55rA+5M+eieO06yF4vE2RZPnHvB17yO40j/xZIlmU2Z86c6mQy2cAwjH4Q2lX8h+5WVVW12OPxtN6l21QByfTSpUsdIyMjVvovXbp0sR2gZFlWs3Hjxrv0fkoApb179y5mGObaXb+p7v8Ac414E3ZqgWwAAAAASUVORK5CYII=';
+
+    // 游戏状态
+    let currentLevel = 0;
+    let gameState = 'START'; 
+    
+    // 输入控制
+    const keys = {
+        ArrowRight: false, ArrowLeft: false, ArrowUp: false, Space: false,
+        KeyD: false, KeyA: false, KeyW: false
+    };
+
+    // 玩家对象 (沈奎)
+    const player = {
+        x: 50, y: 500, width: 30, height: 30,
+        speed: 5, dx: 0, dy: 0, jumpPower: -12, gravity: 0.6,
+        grounded: false,
+        isInterFan: true // 初始身份：国际米兰球迷
+    };
+
+    // 关卡数据 (不变)
+    const levels = [
+        { platforms: [{x: 0, y: 550, w: 800, h: 50, type: 1}], goal: {x: 700, y: 510, w: 40, h: 40}, start: {x: 50, y: 500} },
+        { platforms: [{x: 0, y: 550, w: 800, h: 50, type: 1}, {x: 300, y: 450, w: 100, h: 20, type: 1}, {x: 500, y: 350, w: 100, h: 20, type: 1}], goal: {x: 530, y: 310, w: 40, h: 40}, start: {x: 50, y: 500} },
+        { platforms: [{x: 0, y: 550, w: 200, h: 50, type: 1}, {x: 250, y: 450, w: 100, h: 20, type: 1}, {x: 400, y: 350, w: 100, h: 20, type: 1}, {x: 600, y: 250, w: 200, h: 20, type: 1}], goal: {x: 750, y: 210, w: 40, h: 40}, start: {x: 50, y: 500} },
+        { platforms: [{x: 0, y: 550, w: 150, h: 50, type: 1}, {x: 150, y: 580, w: 500, h: 20, type: 2}, {x: 200, y: 450, w: 80, h: 20, type: 1}, {x: 350, y: 350, w: 80, h: 20, type: 1}, {x: 500, y: 450, w: 80, h: 20, type: 1}, {x: 650, y: 550, w: 150, h: 50, type: 1}], goal: {x: 750, y: 510, w: 40, h: 40}, start: {x: 50, y: 500} },
+        { platforms: [{x: 0, y: 500, w: 100, h: 20, type: 1}, {x: 100, y: 590, w: 700, h: 10, type: 2}, {x: 180, y: 420, w: 60, h: 20, type: 1}, {x: 300, y: 340, w: 60, h: 20, type: 1}, {x: 450, y: 260, w: 40, h: 20, type: 1}, {x: 250, y: 180, w: 40, h: 20, type: 1}, {x: 50, y: 120, w: 150, h: 20, type: 1}], goal: {x: 60, y: 80, w: 40, h: 40}, start: {x: 20, y: 450} }
+    ];
+
+    // 监听键盘
+    window.addEventListener('keydown', (e) => {
+        if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.ArrowRight = true;
+        if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.ArrowLeft = true;
+        if(e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+            if (gameState === 'START' || gameState === 'GAME_OVER' || gameState === 'VICTORY') {
+                resetGame();
+            } else if (player.grounded) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+            }
+            keys.ArrowUp = true;
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.ArrowRight = false;
+        if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.ArrowLeft = false;
+        if(e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.ArrowUp = false;
+    });
+
+    function resetGame() {
+        // 如果是从胜利状态重置，沈奎变回国米球迷
+        if(gameState === 'VICTORY') {
+            currentLevel = 0;
+            player.isInterFan = true; 
+        }
+        loadLevel(currentLevel);
+        gameState = 'PLAYING';
+        msgBox.style.display = 'none';
+        loop();
+    }
+
+    function loadLevel(lvlIndex) {
+        if (lvlIndex >= levels.length) {
+            gameState = 'VICTORY';
+            // --- 关键剧情反转 ---
+            player.isInterFan = false; // 沈奎叛变了！
+            showMessage(`
+                <h2 class="milan-red">Forza Milan!</h2>
+                恭喜沈奎！收集齐了5个队标。<br>
+                <span style="font-size:24px; color:#333">"这红黑的配色...真香啊！"</span><br><br>
+                <strong class="milan-red" style="font-size:28px">沈奎现在光荣的成为了一名<br>AC米兰球迷！</strong><br>
+                <span style='font-size:18px; color:#666'>(按空格键，让沈奎变回国米球迷并重新开始)</span>
+            `);
+            return;
+        }
+        const lvl = levels[lvlIndex];
+        player.x = lvl.start.x;
+        player.y = lvl.start.y;
+        player.dx = 0;
+        player.dy = 0;
+        uiLevel.innerText = lvlIndex + 1;
+    }
+
+    function showMessage(html) {
+        msgBox.innerHTML = html;
+        msgBox.style.display = 'block';
+    }
+
+    function update() {
+        if (gameState !== 'PLAYING') return;
+        // 水平移动
+        if (keys.ArrowRight) player.dx = player.speed;
+        else if (keys.ArrowLeft) player.dx = -player.speed;
+        else player.dx = 0;
+        player.x += player.dx;
+        // 边界与物理 Y
+        if (player.x < 0) player.x = 0;
+        if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        player.dy += player.gravity;
+        player.y += player.dy;
+        // 碰撞检测
+        player.grounded = false;
+        const lvl = levels[currentLevel];
+        for (let plat of lvl.platforms) {
+            if (player.x < plat.x + plat.w && player.x + player.width > plat.x &&
+                player.y < plat.y + plat.h && player.y + player.height > plat.y) {
+                if (plat.type === 2) { playerDeath(); return; }
+                if (player.dy > 0 && player.y + player.height - player.dy <= plat.y) {
+                    player.y = plat.y - player.height;
+                    player.dy = 0;
+                    player.grounded = true;
+                }
+            }
+        }
+        // 终点碰撞 (队标)
+        let goal = lvl.goal;
+        if (player.x < goal.x + goal.w && player.x + player.width > goal.x &&
+            player.y < goal.y + goal.h && player.y + player.height > goal.y) {
+            currentLevel++;
+            loadLevel(currentLevel);
+        }
+        if (player.y > canvas.height) playerDeath();
+    }
+
+    function playerDeath() {
+        player.x = levels[currentLevel].start.x;
+        player.y = levels[currentLevel].start.y;
+        player.dy = 0;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (gameState === 'START') {
+            showMessage(`
+                <h2 class="inter-blue">沈奎大冒险</h2>
+                <span style="font-size:20px; color:#333">身份：<strong>国际米兰球迷</strong></span><br>
+                目标：潜入隔壁，收集 5 个<span class="milan-red">AC米兰队标</span><br>
+                <span style="font-size:16px; color:#666">(别问为什么，问就是信仰)</span><br><br>
+                <span style='font-size:24px'>按空格键开始传教之旅</span>
+            `);
+            return;
+        }
+        if (gameState === 'VICTORY') { 
+            drawPlayer(); // 胜利时也要画出穿新球衣的沈奎
+            return; 
+        }
+
+        const lvl = levels[currentLevel];
+        // 绘制平台
+        for (let plat of lvl.platforms) {
+            ctx.fillStyle = plat.type === 2 ? '#d32f2f' : '#424242';
+            ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
+        }
+        // 绘制终点 (AC米兰队标图片)
+        ctx.drawImage(acLogoImg, lvl.goal.x, lvl.goal.y, lvl.goal.w, lvl.goal.h);
+        
+        drawPlayer();
+    }
+
+    function drawPlayer() {
+        ctx.save();
+        // 根据球迷身份绘制不同皮肤
+        if (player.isInterFan) {
+            // 国际米兰：蓝黑剑条衫
+            ctx.fillStyle = '#0057b8'; // 国际米兰蓝
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#000'; // 黑色条纹
+            ctx.fillRect(player.x + 8, player.y, 6, player.height);
+            ctx.fillRect(player.x + 20, player.y, 6, player.height);
+        } else {
+            // AC米兰：红黑剑条衫
+            ctx.fillStyle = '#c00c0c'; // AC米兰红
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#000'; // 黑色条纹
+            ctx.fillRect(player.x + 8, player.y, 6, player.height);
+            ctx.fillRect(player.x + 20, player.y, 6, player.height);
+        }
+
+        // 绘制名字
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 12px Microsoft YaHei";
+        ctx.textAlign = "center";
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 4;
+        ctx.fillText("沈奎", player.x + player.width/2, player.y - 5);
+        ctx.restore();
+    }
+
+    function loop() {
+        if (gameState === 'PLAYING') {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+    }
+
+    // 等待图片加载完成后再显示开始界面
+    acLogoImg.onload = () => {
+        draw();
+    };
+
+</script>
+</body>
+</html>
