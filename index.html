@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狂将打屁</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .title-container {
+            margin-bottom: 50px;
+        }
+        
+        .main-title {
+            font-size: 6.5rem;
+            font-weight: 900;
+            letter-spacing: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.7),
+                         0 0 40px rgba(255, 100, 100, 0.5),
+                         0 0 60px rgba(255, 50, 50, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: linear-gradient(to right, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: titleGlow 3s infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.7),
+                             0 0 40px rgba(255, 100, 100, 0.5),
+                             0 0 60px rgba(255, 50, 50, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 25px rgba(255, 255, 255, 0.8),
+                             0 0 50px rgba(255, 150, 100, 0.6),
+                             0 0 75px rgba(255, 100, 50, 0.4);
+            }
+        }
+        
+        .main-title:hover {
+            transform: scale(1.05) rotate(-1deg);
+        }
+        
+        .subtitle {
+            font-size: 1.8rem;
+            color: #a3d9ff;
+            margin-bottom: 40px;
+            font-style: italic;
+            letter-spacing: 3px;
+        }
+        
+        .characters-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .character-box {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .character-box:nth-child(1) { background: linear-gradient(45deg, #ff7e5f, #feb47b); }
+        .character-box:nth-child(2) { background: linear-gradient(45deg, #86a8e7, #91eae4); }
+        .character-box:nth-child(3) { background: linear-gradient(45deg, #d4fc79, #96e6a1); }
+        .character-box:nth-child(4) { background: linear-gradient(45deg, #fc5c7d, #6a82fb); }
+        
+        .character-box:hover {
+            transform: translateY(-15px) scale(1.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+        
+        .character-box:active {
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .character-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .character-box:hover::before {
+            left: 100%;
+        }
+        
+        .description {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            color: #c2e0ff;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-left: 5px solid #ff7e5f;
+        }
+        
+        .interactive-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 126, 95, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .sound-btn {
+            background: linear-gradient(to right, #86a8e7, #91eae4);
+            box-shadow: 0 5px 15px rgba(134, 168, 231, 0.4);
+        }
+        
+        .animate-btn {
+            background: linear-gradient(to right, #d4fc79, #96e6a1);
+            box-shadow: 0 5px 15px rgba(212, 252, 121, 0.4);
+        }
+        
+        .footer {
+            margin-top: 50px;
+            color: #86a8e7;
+            font-size: 1rem;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .jump {
+            animation: jump 0.5s ease;
+        }
+        
+        @keyframes jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 4rem;
+                letter-spacing: 5px;
+            }
+            
+            .subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .character-box {
+                width: 150px;
+                height: 150px;
+                font-size: 3.5rem;
+            }
+            
+            .description {
+                font-size: 1.1rem;
+                padding: 20px;
+            }
+            
+            button {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 3rem;
+                letter-spacing: 3px;
+            }
+            
+            .character-box {
+                width: 120px;
+                height: 120px;
+                font-size: 2.8rem;
+            }
+            
+            .characters-container {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-container">
+            <h1 class="main-title" id="mainTitle">狂将打屁</h1>
+            <p class="subtitle">四个汉字 · 无限创意 · 趣味互动</p>
+        </div>
+        
+        <div class="characters-container">
+            <div class="character-box" id="char1">狂</div>
+            <div class="character-box" id="char2">将</div>
+            <div class="character-box" id="char3">打</div>
+            <div class="character-box" id="char4">屁</div>
+        </div>
+        
+        <div class="description">
+            <p><strong>"狂将打屁"</strong> 是一个充满趣味和想象力的四字组合。它可以是一个游戏角色、一部小说标题、一个品牌名称，或者仅仅是一个有趣的词汇组合。每个字都有其独特的含义：</p>
+            <p><strong>狂</strong> - 代表豪放不羁、激情四射；<strong>将</strong> - 象征领导力与气魄；<strong>打</strong> - 体现行动力与力量；<strong>屁</strong> - 带来幽默与轻松感。</p>
+            <p>这个组合既体现了力量与气势，又不失幽默与趣味，形成了独特的反差魅力。</p>
+        </div>
+        
+        <div class="interactive-section">
+            <h2><i class="fas fa-gamepad"></i> 互动体验</h2>
+            <p>点击下面的按钮与这四个字进行互动</p>
+            
+            <div class="controls">
+                <button id="pulseBtn"><i class="fas fa-expand-alt"></i> 脉冲效果</button>
+                <button id="shakeBtn" class="sound-btn"><i class="fas fa-volume-up"></i> 抖动效果</button>
+                <button id="jumpBtn" class="animate-btn"><i class="fas fa-bounce"></i> 跳跃效果</button>
+                <button id="colorBtn"><i class="fas fa-palette"></i> 随机颜色</button>
+                <button id="resetBtn"><i class="fas fa-redo"></i> 重置效果</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 狂将打屁创意展示 | 设计：HTML + CSS + JavaScript | 仅供娱乐</p>
+            <p>刷新页面或点击重置按钮可恢复初始状态</p>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const mainTitle = document.getElementById('mainTitle');
+        const charBoxes = document.querySelectorAll('.character-box');
+        const pulseBtn = document.getElementById('pulseBtn');
+        const shakeBtn = document.getElementById('shakeBtn');
+        const jumpBtn = document.getElementById('jumpBtn');
+        const colorBtn = document.getElementById('colorBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // 为每个字符框添加点击事件
+        charBoxes.forEach((box, index) => {
+            box.addEventListener('click', () => {
+                // 移除其他字符的动画类
+                charBoxes.forEach(b => b.classList.remove('pulse', 'shake', 'jump'));
+                
+                // 为点击的字符添加脉冲动画
+                box.classList.add('pulse');
+                
+                // 播放音效（模拟）
+                playSound(index);
+            });
+        });
+        
+        // 脉冲效果按钮
+        pulseBtn.addEventListener('click', () => {
+            removeAllEffects();
+            charBoxes.forEach(box => {
+                box.classList.add('pulse');
+            });
+            mainTitle.classList.add('pulse');
+        });
+        
+        // 抖动效果按钮
+        shakeBtn.addEventListener('click', () => {
+            removeAllEffects();
+            charBoxes.forEach(box => {
+                box.classList.add('shake');
+            });
+            mainTitle.classList.add('shake');
+            playSound(0);
+        });
+        
+        // 跳跃效果按钮
+        jumpBtn.addEventListener('click', () => {
+            removeAllEffects();
+            charBoxes.forEach((box, index) => {
+                // 为每个字符设置不同的动画延迟
+                box.style.animationDelay = `${index * 0.1}s`;
+                box.classList.add('jump');
+            });
+            mainTitle.classList.add('jump');
+        });
+        
+        // 随机颜色按钮
+        colorBtn.addEventListener('click', () => {
+            const colors = [
+                'linear-gradient(45deg, #FF6B6B, #FFE66D)',
+                'linear-gradient(45deg, #4ECDC4, #556270)',
+                'linear-gradient(45deg, #834D9B, #D04ED6)',
+                'linear-gradient(45deg, #1D976C, #93F9B9)',
+                'linear-gradient(45deg, #FF8008, #FFC837)',
+                'linear-gradient(45deg, #3494E6, #EC6EAD)'
+            ];
+            
+            charBoxes.forEach(box => {
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                box.style.background = randomColor;
+            });
+            
+            // 随机改变标题颜色
+            const titleColors = [
+                'linear-gradient(to right, #FF6B6B, #FFE66D, #4ECDC4, #449DD1)',
+                'linear-gradient(to right, #834D9B, #D04ED6, #FF8008, #FFC837)',
+                'linear-gradient(to right, #1D976C, #93F9B9, #3494E6, #EC6EAD)',
+                'linear-gradient(to right, #FF7E5F, #FEB47B, #86A8E7, #91EAE4)'
+            ];
+            mainTitle.style.background = titleColors[Math.floor(Math.random() * titleColors.length)];
+            mainTitle.style.webkitBackgroundClip = 'text';
+            mainTitle.style.backgroundClip = 'text';
+        });
+        
+        // 重置按钮
+        resetBtn.addEventListener('click', () => {
+            removeAllEffects();
+            
+            // 重置字符框颜色
+            charBoxes[0].style.background = 'linear-gradient(45deg, #ff7e5f, #feb47b)';
+            charBoxes[1].style.background = 'linear-gradient(45deg, #86a8e7, #91eae4)';
+            charBoxes[2].style.background = 'linear-gradient(45deg, #d4fc79, #96e6a1)';
+            charBoxes[3].style.background = 'linear-gradient(45deg, #fc5c7d, #6a82fb)';
+            
+            // 重置标题颜色
+            mainTitle.style.background = 'linear-gradient(to right, #ff7e5f, #feb47b, #86a8e7, #91eae4)';
+            mainTitle.style.webkitBackgroundClip = 'text';
+            mainTitle.style.backgroundClip = 'text';
+            
+            // 重置动画延迟
+            charBoxes.forEach(box => {
+                box.style.animationDelay = '0s';
+            });
+        });
+        
+        // 移除所有效果
+        function removeAllEffects() {
+            charBoxes.forEach(box => {
+                box.classList.remove('pulse', 'shake', 'jump');
+            });
+            mainTitle.classList.remove('pulse', 'shake', 'jump');
+        }
+        
+        // 模拟音效函数
+        function playSound(index) {
+            // 在实际应用中，这里可以加载和播放音频文件
+            // 这里我们只是用控制台输出模拟
+            const sounds = ['狂!', '将!', '打!', '屁!'];
+            console.log(`播放音效: ${sounds[index]}`);
+            
+            // 创建音频上下文（简单的音效模拟）
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // 设置不同字符对应不同频率
+                const frequencies = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+                oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log("音频上下文不支持，但交互正常");
+            }
+        }
+        
+        // 标题点击事件
+        mainTitle.addEventListener('click', () => {
+            mainTitle.classList.toggle('pulse');
+            playSound(0);
+        });
+        
+        // 页面加载时添加初始动画
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                mainTitle.classList.add('pulse');
+                
+                // 逐个显示字符框
+                charBoxes.forEach((box, index) => {
+                    setTimeout(() => {
+                        box.style.opacity = '0';
+                        box.style.transform = 'translateY(50px)';
+                        box.style.display = 'flex';
+                        
+                        setTimeout(() => {
+                            box.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                            box.style.opacity = '1';
+                            box.style.transform = 'translateY(0)';
+                        }, 100);
+                    }, index * 200);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
